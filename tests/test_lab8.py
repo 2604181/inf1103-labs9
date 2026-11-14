@@ -268,8 +268,9 @@ class TestLspAndPolymorphism(RelationshipTestCase):
                 self.assertEqual(product.get_stock(), 60)
                 self.assertIsNone(product.update_stock(0))      # valid input accepted
                 self.assertEqual(product.get_stock(), 0)
-                product.update_stock(-5)                         # invalid ignored, no crash
-                self.assertEqual(product.get_stock(), 0)
+                with self.assertRaises(ValueError):             # Lab 9: invalid is rejected
+                    product.update_stock(-5)
+                self.assertEqual(product.get_stock(), 0)        # ...and stock is unchanged
 
     def test_subclasses_do_not_override_update_stock(self):
         self.assertIs(PhysicalProduct.update_stock, Product.update_stock)

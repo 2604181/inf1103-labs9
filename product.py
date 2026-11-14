@@ -1,5 +1,5 @@
 """
-INF1103 Week 10 - Product (abstract base class)
+INF1103 Week 11 - Product (abstract base class)
 Responsibility: represent what is COMMON to every product and manage its own state.
 Association: a Product refers to ONE Supplier (it does not own it).
 """
@@ -11,6 +11,12 @@ from supplier import Supplier
 class Product(ABC):
     def __init__(self, product_id: str, name: str, price: float,
                  stock: int, supplier: Supplier) -> None:
+        # Validation lives HERE, in the class that owns the rule. Subclasses call
+        # super().__init__(), so they cannot skip it (LSP).
+        if price <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if stock < 0:
+            raise ValueError("Stock quantity cannot be negative.")
         self.__product_id: str = product_id
         self.__name: str = name
         self.__price: float = price
@@ -20,11 +26,12 @@ class Product(ABC):
     def update_stock(self, quantity: int) -> None:
         """
         Contract every Product (and every subclass) must keep:
-        set the stock to `quantity` when quantity >= 0, ignore negative values,
-        never raise an error, and return nothing.
+        set the stock to `quantity`, and raise ValueError if quantity is negative
+        (the stock is left unchanged in that case).
         """
-        if quantity >= 0:
-            self.__stock = quantity
+        if quantity < 0:
+            raise ValueError("Stock quantity cannot be negative.")
+        self.__stock = quantity
 
     def get_product_id(self) -> str:
         return self.__product_id

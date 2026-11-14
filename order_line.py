@@ -1,5 +1,7 @@
 """
-INF1103 Week 10 - OrderLine class
+INF1103 Week 11 - OrderLine class
+Composition: an OrderLine is PART of exactly one Order. Only the Order creates it.
+Association: an OrderLine REFERS to a Product but does not own it.
 """
 from product import Product
 
@@ -7,7 +9,7 @@ from product import Product
 class OrderLine:
     def __init__(self, product: Product, quantity: int) -> None:
         if quantity <= 0:
-            raise ValueError("Quantity must be at least 1.")
+            raise ValueError("Quantity must be greater than zero.")
         self.__product: Product = product
         self.__quantity: int = quantity
 

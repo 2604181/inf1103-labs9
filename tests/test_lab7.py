@@ -95,7 +95,8 @@ class TestProductTypes(unittest.TestCase):
     def test_update_stock_through_method(self):
         self.physical.update_stock(50)
         self.assertEqual(self.physical.get_stock(), 50)
-        self.physical.update_stock(-5)
+        with self.assertRaises(ValueError):      # Lab 9: negative stock is rejected
+            self.physical.update_stock(-5)
         self.assertEqual(self.physical.get_stock(), 50)
 
     def test_negative_weight_or_size_rejected(self):
