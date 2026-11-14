@@ -76,5 +76,18 @@
         },
         "type": "digital",
         "download_size": 210.0
+    },
+    {
+        "id": "D006",
+        "name": "Microsoft Office",
+        "price": 159.99,
+        "stock": 50,
+        "supplier": {
+            "id": "S001",
+            "name": "TechSource Pte Ltd",
+            "email": "sales@techsource.sg"
+        },
+        "type": "digital",
+        "download_size": 1000.0
     }
 ]

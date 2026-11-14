@@ -1,14 +1,15 @@
-﻿"""
-INF1103 Week 10 - Inventory Manager (OOP: relationships, type hints, LSP)
+"""
+INF1103 Week 11 - Inventory Manager (Strategy, Factory, validation, exceptions)
 Responsibility: display the menu, get user input, call Inventory methods.
 """
 from inventory import Inventory
 from product import Product
 from supplier import Supplier
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 from can_be_shipped import CanBeShipped
-from file_handling import load_inventory, save_inventory, INVENTORY_FILE
+from file_handling import load_inventory, save_inventory, load_products, INVENTORY_FILE
+
+PRODUCTS_CSV_FILE: str = "products.csv"
 
 
 def get_valid_int(prompt: str) -> int:
@@ -31,6 +32,19 @@ def get_valid_float(prompt: str) -> float:
             print("Error. Value cannot be negative.")
             continue
         return number
+
+
+def get_positive_float(prompt: str) -> float:
+    """Keep asking until the user types a number greater than zero."""
+    while True:
+        try:
+            value: float = float(input(prompt))
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
 
 
 def get_non_empty_text(prompt: str) -> str:
@@ -86,7 +100,8 @@ def display_menu() -> None:
     print("3. Update Stock")
     print("4. Search Product")
     print("5. Save Inventory")
-    print("6. Exit")
+    print("6. Load Products from CSV")
+    print("7. Exit")
     print("----------------------------")
 
 
@@ -135,20 +150,18 @@ def main() -> None:
             if product_id == "" or name == "":
                 print("Error. Product ID and Name cannot be empty.")
             else:
-                price: float = get_valid_float("Price: ")
+                price: float = get_positive_float("Price: ")
                 stock: int = get_valid_int("Stock Quantity: ")
                 supplier: Supplier = get_supplier(suppliers)
-                new_product: Product
+                type_name: str = "physical" if product_type == "1" else "digital"
                 if product_type == "1":
-                    weight: float = get_valid_float("Weight (kg): ")
-                    new_product = PhysicalProduct(
-                        product_id, name, price, stock, supplier, weight
-                    )
+                    extra_value: float = get_valid_float("Weight (kg): ")
                 else:
-                    download_size: float = get_valid_float("Download Size (MB): ")
-                    new_product = DigitalProduct(
-                        product_id, name, price, stock, supplier, download_size
-                    )
+                    extra_value = get_valid_float("Download Size (MB): ")
+                # The factory decides which Product subclass to build
+                new_product: Product = ProductFactory.create(
+                    type_name, product_id, name, price, stock, supplier, extra_value
+                )
                 if inventory.add_product(new_product):
                     suppliers[supplier.get_supplier_id()] = supplier
                     print("Product added successfully!")
@@ -166,8 +179,11 @@ def main() -> None:
                 print(f"Name: {found.get_name()}")
                 print(f"Current Stock: {found.get_stock()}")
                 new_stock: int = get_valid_int("New Stock Quantity: ")
-                found.update_stock(new_stock)
-                print("Stock updated successfully!")
+                try:
+                    found.update_stock(new_stock)
+                    print("Stock updated successfully!")
+                except ValueError as error:
+                    print(f"Error. {error}")
 
         elif option == "4":
             print("Search Product")
@@ -193,6 +209,12 @@ def main() -> None:
             print(f"Inventory saved successfully to {INVENTORY_FILE}.")
 
         elif option == "6":
+            print("Load Products from CSV")
+            csv_supplier: Supplier = get_supplier(suppliers)
+            load_products(PRODUCTS_CSV_FILE, inventory, csv_supplier)
+            suppliers[csv_supplier.get_supplier_id()] = csv_supplier
+
+        elif option == "7":
             print("Saving inventory before exit...")
             save_inventory(inventory.get_all_products())
             print("Inventory saved successfully.")
@@ -201,7 +223,7 @@ def main() -> None:
             exit_program = True
 
         else:
-            print("Invalid option. Please enter a number from 1 to 6.")
+            print("Invalid option. Please enter a number from 1 to 7.")
 
 
 # __name__ (Program Entry Point)
