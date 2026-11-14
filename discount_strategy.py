@@ -42,3 +42,11 @@ class BulkDiscount(DiscountStrategy):
         if total >= self.__threshold:
             return total - self.__amount
         return total
+
+
+class StudentDiscount(DiscountStrategy):
+    """Fourth strategy (Section 2.4): a flat 5% off. Added WITHOUT touching Order."""
+    STUDENT_PERCENT: float = 5.0
+
+    def apply(self, total: float) -> float:
+        return total - total * self.STUDENT_PERCENT / 100
