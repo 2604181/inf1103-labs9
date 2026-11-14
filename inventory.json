@@ -89,5 +89,18 @@
         },
         "type": "digital",
         "download_size": 1000.0
+    },
+    {
+        "id": "D001",
+        "name": "Photo Editor",
+        "price": 49.9,
+        "stock": 100,
+        "supplier": {
+            "id": "S001",
+            "name": "TechSource Pte Ltd",
+            "email": "sales@techsource.sg"
+        },
+        "type": "digital",
+        "download_size": 0.0
     }
 ]
